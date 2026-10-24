@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://rivero-roofing.vercel.app/sitemap.xml
