@@ -192,8 +192,9 @@ footer{border-top:2px solid var(--neon);padding:40px 28px 26px;background:#05050
 .foot small{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--gray);letter-spacing:.1em}
 .hazard-bar{height:14px;background:var(--hazard);margin-top:26px}
 /* floating call */
-.float-call{position:fixed;bottom:20px;right:20px;z-index:80;background:var(--neon);color:#000;font-family:"IBM Plex Mono",monospace;font-weight:700;font-size:14px;padding:16px 22px;border:3px solid #000;box-shadow:6px 6px 0 #000;display:flex;gap:10px;align-items:center}
+.float-call{position:fixed;bottom:20px;right:20px;z-index:80;background:var(--neon);color:#000;font-family:"IBM Plex Mono",monospace;font-weight:700;font-size:14px;padding:16px 22px;border:3px solid #000;box-shadow:6px 6px 0 #000;display:flex;gap:10px;align-items:center;transition:transform .3s ease,opacity .3s ease}
 .float-call:hover{transform:translate(-2px,-2px)}
+.float-call.hide{transform:translateY(140%);opacity:0;pointer-events:none}
 img{max-width:100%}
 #services,#why,#work,#contact{overflow:hidden}
 /* reveal */
@@ -260,7 +261,8 @@ img{max-width:100%}
   .fb-btn{font-size:14px;justify-content:center;text-align:center;flex-wrap:wrap}
   .owner-avatar{width:110px;height:110px}
   .foot{flex-direction:column;align-items:flex-start}
-  .float-call{bottom:calc(12px + env(safe-area-inset-bottom));right:12px;left:12px;justify-content:center;font-size:13px;padding:14px 16px;box-shadow:4px 4px 0 #000}
+  .float-call{bottom:calc(12px + env(safe-area-inset-bottom));right:12px;left:auto;justify-content:center;font-size:13px;padding:14px 18px;box-shadow:4px 4px 0 #000;max-width:calc(100vw - 24px)}
+  .float-call.hide{transform:translateY(160%)}
   .est-row{grid-template-columns:1fr}
 }
 </style>
@@ -428,9 +430,20 @@ img{max-width:100%}
   <div class="hazard-bar"></div>
 </footer>
 
-<a class="float-call" href="tel:+19564588555">☎ (956) 458-8555</a>
+<a class="float-call" id="floatCall" href="tel:+19564588555">☎ (956) 458-8555</a>
 
 <script>
+/* hide floating call when a page call button or contact section is on screen */
+const floatCall = document.getElementById("floatCall");
+const callTargets = Array.from(document.querySelectorAll(".hero-btns, .contact-left .btn-call-big, #contact"));
+let hideCount = 0;
+function updateFloatCall(){ floatCall.classList.toggle("hide", hideCount > 0); }
+if("IntersectionObserver" in window && floatCall){
+  const callIO = new IntersectionObserver(es=>{
+    es.forEach(x=>{ hideCount += x.isIntersecting ? 1 : -1; if(hideCount<0) hideCount=0; updateFloatCall(); });
+  },{threshold:.15});
+  callTargets.forEach(el=>el && callIO.observe(el));
+}
 function paintMarquee(){
   const m = document.getElementById("marquee");
   const lang = document.documentElement.lang === "es" ? "es" : "en";
